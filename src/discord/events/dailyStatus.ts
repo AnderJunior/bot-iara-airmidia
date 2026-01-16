@@ -11,16 +11,39 @@ createEvent({
         const sendHour = env.STATUS_SEND_HOUR ?? 18;
         const sendMinute = env.STATUS_SEND_MINUTE ?? 40;
         
-        console.log(`✅ Bot está pronto! Agendando envio diário de status às ${String(sendHour).padStart(2, '0')}:${String(sendMinute).padStart(2, '0')}...`);
+        console.log(`✅ Bot está pronto! Agendando envio diário de status às ${String(sendHour).padStart(2, '0')}:${String(sendMinute).padStart(2, '0')} (horário de Brasília)...`);
 
         let lastSentDate = ""; // Armazenar a data do último envio para evitar duplicatas
 
+        // Função para obter o horário atual no fuso horário de Brasília
+        function getBrazilTimeInfo() {
+            const now = new Date();
+            // Usar Intl.DateTimeFormat para obter valores no fuso horário de Brasília
+            const formatter = new Intl.DateTimeFormat("pt-BR", {
+                timeZone: "America/Sao_Paulo",
+                hour: "numeric",
+                minute: "numeric",
+                day: "numeric",
+                month: "numeric",
+                year: "numeric"
+            });
+            
+            const parts = formatter.formatToParts(now);
+            const hour = parseInt(parts.find(p => p.type === "hour")?.value || "0", 10);
+            const minute = parseInt(parts.find(p => p.type === "minute")?.value || "0", 10);
+            const day = parts.find(p => p.type === "day")?.value || "0";
+            const month = parts.find(p => p.type === "month")?.value || "0";
+            const year = parts.find(p => p.type === "year")?.value || "0";
+            
+            return { hour, minute, dateString: `${month}/${day}/${year}` };
+        }
+
         // Função para verificar e enviar mensagem
         async function checkAndSendStatus() {
-            const now = new Date();
-            const hour = now.getHours();
-            const minute = now.getMinutes();
-            const todayDate = now.toDateString(); // Data no formato "Mon Jan 01 2024"
+            const brazilTime = getBrazilTimeInfo();
+            const hour = brazilTime.hour;
+            const minute = brazilTime.minute;
+            const todayDate = brazilTime.dateString; // Data no formato "MM/DD/YYYY"
 
             // Verificar se é o horário configurado e se ainda não foi enviado hoje
             if (hour === sendHour && minute === sendMinute && lastSentDate !== todayDate) {
@@ -60,7 +83,7 @@ createEvent({
                     });
 
                     lastSentDate = todayDate; // Marcar que foi enviado hoje
-                    console.log(`✅ Status diário enviado com sucesso às ${now.toLocaleTimeString('pt-BR')}!`);
+                    console.log(`✅ Status diário enviado com sucesso às ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} (horário de Brasília)!`);
                 } catch (error: any) {
                     console.error("❌ Erro ao enviar status diário:", error.message);
                 }
