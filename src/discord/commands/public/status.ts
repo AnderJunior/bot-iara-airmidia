@@ -3,8 +3,8 @@ import { ApplicationCommandType, ContainerBuilder, TextDisplayBuilder } from "di
 import { getUsuariosStatusMessage } from "../../functions/getUsuariosStatus.js";
 
 createCommand({
-    name: "test-supabase",
-    description: "Teste de busca completa dos status dos usuários no Supabase 🔍",
+    name: "status",
+    description: "Busca completa dos status dos usuários no Supabase 🔍",
     type: ApplicationCommandType.ChatInput,
     async run(interaction) {
         await interaction.deferReply();
