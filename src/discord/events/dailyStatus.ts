@@ -4,7 +4,7 @@ import { getUsuariosStatusMessage } from "../functions/getUsuariosStatus.js";
 
 createEvent({
     name: "Daily Status Report",
-    event: "ready",
+    event: "clientReady",
     once: true,
     async run(client) {
         // Obter horário configurado no .env (padrão: 18:40)
